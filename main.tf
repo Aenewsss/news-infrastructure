@@ -31,3 +31,9 @@ module "security" {
 
   zone_id = local.zone_id
 }
+
+module "speed" {
+  source = "./modules/speed"
+
+  zone_id = local.zone_id
+}
