@@ -10,6 +10,7 @@ locals {
     min_tls_version          = "1.2"  # TLS mínimo aceito
     ssl                      = "full" # modo SSL com origem (use "strict" se tiver cert válido na origem)
     early_hints              = "on"   #  browser começa a precarregar assets antes mesmo da resposta final → reduz LCP (Large Contentful Paint)
+    speed_brain              = "on"   # pré-carrega links de outras páginas para o usuário (assim as páginas abrem quase instantaneamente)
   }
 }
 
