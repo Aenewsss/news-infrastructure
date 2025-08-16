@@ -13,12 +13,3 @@ terraform {
     }
   }
 }
-
-provider "cloudflare" {
-  api_token = var.cloudflare_api_token
-}
-
-provider "upstash" {
-  api_key = var.upstash_api_key
-  email   = var.upstash_email
-}
