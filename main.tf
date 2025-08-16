@@ -16,16 +16,6 @@ module "dns" {
   zone_id            = local.zone_id
 }
 
-# module "pages" {
-#   source = "./modules/pages"
-
-#   account_id         = local.account_id
-#   pages_project_name = var.pages_project_name
-#   domain             = var.prod_domain
-#   github_owner       = var.github_owner
-#   repo_name          = var.repo_name
-# }
-
 module "security" {
   source = "./modules/security"
 

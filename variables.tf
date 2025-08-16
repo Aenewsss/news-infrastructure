@@ -15,14 +15,6 @@ variable "domain" {
   default = "lab-portal"
 }
 
-variable "github_owner" {
-  type = string
-}
-
-variable "repo_name" {
-  type = string
-}
-
 variable "upstash_api_key" {
   type = string
 }
