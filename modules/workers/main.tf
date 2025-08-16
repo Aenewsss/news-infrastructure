@@ -5,7 +5,7 @@
 # Worker que recebe HTTP e faz XADD na stream
 resource "cloudflare_workers_script" "producer" {
   account_id         = var.account_id
-  script_name        = var.worker_name
+  script_name        = var.producer_worker_name
   content            = file("${path.module}/scripts/producer.mjs")
   main_module        = "producer.mjs"
   compatibility_date = "2024-12-01"
@@ -56,7 +56,7 @@ resource "cloudflare_workers_kv_namespace" "cursors" {
 # Arquivo do worker
 resource "cloudflare_workers_script" "consumer" {
   account_id         = var.account_id
-  script_name        = var.worker_name
+  script_name        = var.consumer_worker_name
   content            = file("${path.module}/scripts/consumer.mjs")
   main_module        = "consumer.mjs"
   compatibility_date = "2024-12-01"
@@ -118,4 +118,43 @@ resource "cloudflare_workers_cron_trigger" "schedule" {
   schedules = [
     { cron = var.cron_schedule }
   ] # ex.: "*/1 * * * *"
+}
+
+
+##############################################
+##### Worker: uploader/servidor de mídia #####
+#############################################
+resource "cloudflare_workers_script" "uploader" {
+  account_id         = var.account_id
+  script_name        = var.uploader_worker_name
+  content            = file("${path.module}/scripts/uploader.mjs")
+  main_module        = "uploader.mjs"
+  compatibility_date = "2024-12-01"
+  usage_model        = "standard"
+
+  bindings = [
+    {
+      name = "MAX_UPLOAD_BYTES",
+      text = tostring(var.max_upload_bytes),
+      type = "secret_text"
+    },
+    {
+      name = "ALLOWED_MIME_PREFIX",
+      text = join(",", var.allowed_mime_prefixes),
+      type = "secret_text"
+    },
+    {
+      name        = "R2_MEDIA"
+      bucket_name = var.r2_bucket_name,
+      type        = "r2_bucket"
+    }
+  ]
+}
+
+# Rota HTTP (publique onde preferir)
+resource "cloudflare_workers_route" "media_route" {
+  count   = length(var.route_pattern) > 0 ? 1 : 0
+  zone_id = var.zone_id
+  script  = cloudflare_workers_script.uploader.script_name
+  pattern = var.route_pattern
 }

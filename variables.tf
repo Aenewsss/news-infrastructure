@@ -43,3 +43,7 @@ variable "loki_user" {
 variable "loki_password" {
   type = string
 }
+
+variable "bucket_name" {
+  type = string
+}

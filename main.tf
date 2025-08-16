@@ -52,4 +52,17 @@ module "workers" {
   loki_user          = var.loki_user
   upstash_rest_token = module.queues.upstash_rest_token
   upstash_rest_url   = module.queues.upstash_rest_url
+  r2_bucket_name     = var.bucket_name
+
+  depends_on = [
+    module.r2
+  ]
+}
+
+module "r2" {
+  source = "./modules/r2"
+
+  account_id  = local.account_id
+  zone_id     = local.zone_id
+  bucket_name = var.bucket_name
 }
