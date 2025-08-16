@@ -11,7 +11,7 @@ locals {
 
 module "dns" {
   source             = "./modules/dns"
-  pages_project_name = var.pages_project_name
+  pages_project_name = var.project_name
   zone_name          = var.zone_name
   zone_id            = local.zone_id
 }
@@ -65,4 +65,12 @@ module "r2" {
   account_id  = local.account_id
   zone_id     = local.zone_id
   bucket_name = var.bucket_name
+}
+
+module "database" {
+  source = "./modules/database"
+
+  db_name      = var.neon_db_name
+  project_name = var.project_name
+  neon_api_key = var.neon_api_key
 }

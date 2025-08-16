@@ -11,6 +11,11 @@ terraform {
       source  = "upstash/upstash"
       version = "1.5.3"
     }
+
+    neon = {
+      source  = "kislerdm/neon"
+      version = "0.9.0"
+    }
   }
 }
 
@@ -21,4 +26,8 @@ provider "cloudflare" {
 provider "upstash" {
   api_key = var.upstash_api_key
   email   = var.upstash_email
+}
+
+provider "neon" {
+  api_key = var.neon_api_key
 }

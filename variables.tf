@@ -6,9 +6,9 @@ variable "zone_name" {
   type = string
 }
 
-variable "pages_project_name" {
+variable "project_name" {
   type    = string
-  default = "portal-frontend"
+  default = "lab-portal"
 }
 variable "domain" {
   type    = string
@@ -45,5 +45,13 @@ variable "loki_password" {
 }
 
 variable "bucket_name" {
+  type = string
+}
+
+variable "neon_api_key" {
+  type = string
+}
+
+variable "neon_db_name" {
   type = string
 }
