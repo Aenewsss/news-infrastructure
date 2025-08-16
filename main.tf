@@ -35,11 +35,21 @@ module "cache" {
   zone_id = local.zone_id
 }
 
-module "queue" {
+module "queues" {
   source = "./modules/queues"
 
-  account_id              = local.account_id
-  zone_id                 = local.zone_id
   upstash_database_name   = var.upstash_database_name
   upstash_database_region = var.upstash_database_region
+}
+
+module "workers" {
+  source = "./modules/workers"
+
+  account_id         = local.account_id
+  zone_id            = local.zone_id
+  loki_endpoint      = var.loki_endpoint
+  loki_password      = var.loki_password
+  loki_user          = var.loki_user
+  upstash_rest_token = module.queues.upstash_rest_token
+  upstash_rest_url   = module.queues.upstash_rest_url
 }

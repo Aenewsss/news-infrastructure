@@ -31,3 +31,15 @@ variable "upstash_database_region" {
   type    = string
   default = "us-east-1"
 }
+
+variable "loki_endpoint" {
+  type = string
+}
+
+variable "loki_user" {
+  type = string
+}
+
+variable "loki_password" {
+  type = string
+}
