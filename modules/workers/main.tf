@@ -57,7 +57,7 @@ resource "cloudflare_workers_kv_namespace" "cursors" {
 resource "cloudflare_workers_script" "consumer" {
   account_id         = var.account_id
   script_name        = var.consumer_worker_name
-  content            = file("${path.module}/scripts/consumer.mjs")
+  content            = file("${path.module}/scripts/dist/consumer.js")
   main_module        = "consumer.mjs"
   compatibility_date = "2024-12-01"
   usage_model        = "standard"
@@ -108,6 +108,11 @@ resource "cloudflare_workers_script" "consumer" {
       text = var.log_app
       type = "secret_text"
     },
+    {
+      name = "NEON_DATABASE_URL"
+      text = var.neon_database_url
+      type = "secret_text"
+    }
   ]
 }
 
@@ -157,4 +162,50 @@ resource "cloudflare_workers_route" "media_route" {
   zone_id = var.zone_id
   script  = cloudflare_workers_script.uploader.script_name
   pattern = var.route_pattern
+}
+
+
+##############################################
+##### Worker: revalidate/purge cache #####
+#############################################
+resource "cloudflare_workers_script" "revalidate" {
+  account_id         = var.account_id
+  script_name        = "revalidate-purge"
+  content            = file("${path.module}/scripts/revalidate.mjs")
+  main_module        = "revalidate.mjs"
+  compatibility_date = "2024-12-01"
+
+  bindings = [
+    {
+      name = "ZONE_ID",
+      text = var.zone_id,
+      type = "secret_text"
+    },
+    {
+      name = "API_TOKEN",
+      text = var.api_purge_token,
+      type = "secret_text"
+    },
+    {
+      name = "REVALIDATE_TOKEN"
+      text = var.revalidate_token
+      type = "secret_text"
+    },
+    {
+      name = "NEXT_REVALIDATE_SECRET"
+      text = var.next_revalidate_secret
+      type = "secret_text"
+    },
+    {
+      name = "NEXT_REVALIDATE_URL"
+      text = "${var.next_host}/api/revalidate"
+      type = "secret_text"
+    }
+  ]
+}
+
+resource "cloudflare_workers_route" "revalidate_route" {
+  zone_id = var.zone_id
+  pattern = "${var.domain}/revalidate"
+  script  = cloudflare_workers_script.revalidate.script_name
 }

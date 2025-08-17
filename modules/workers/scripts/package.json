@@ -1,0 +1,14 @@
+{
+    "name": "workers-consumer",
+    "private": true,
+    "type": "module",
+    "devDependencies": {
+        "esbuild": "^0.23.0"
+    },
+    "dependencies": {
+        "@neondatabase/serverless": "^0.10.4"
+    },
+    "scripts": {
+        "build:consumer": "esbuild consumer.mjs --bundle --platform=neutral --format=esm --target=es2022 --external:node:* --outfile=dist/consumer.js"
+    }
+}

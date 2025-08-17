@@ -55,3 +55,19 @@ variable "neon_api_key" {
 variable "neon_db_name" {
   type = string
 }
+
+variable "revalidate_token" {
+  type = string
+}
+
+variable "next_revalidate_secret" {
+  type = string
+}
+
+variable "next_host" {
+  type = string
+}
+
+variable "api_purge_token" {
+  type = string
+}

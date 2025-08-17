@@ -81,3 +81,27 @@ variable "allowed_mime_prefixes" {
 variable "r2_bucket_name" {
   type = string
 }
+
+variable "neon_database_url" {
+  type = string
+}
+
+variable "api_purge_token" {
+  type = string
+}
+
+variable "revalidate_token" {
+  type = string
+}
+
+variable "next_revalidate_secret" {
+  type = string
+}
+
+variable "next_host" {
+  type = string
+}
+
+variable "domain" {
+  type = string
+}

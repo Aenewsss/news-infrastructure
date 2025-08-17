@@ -6,6 +6,8 @@
  * Formato esperado no stream (exemplo):
  * XADD views * articleId abc123 count 1 ts 1734384000
  */
+import { neon, neonConfig } from "@neondatabase/serverless";
+
 export default {
     async scheduled(event, env, ctx) {
         const started = Date.now();
@@ -54,8 +56,47 @@ export default {
                 newCursor = item.id; // último processado
             }
 
-            // >>> aqui entraria seu flush para o Neon com os agregados de 'counters' <<<
+            // 3.5) se não houve eventos válidos, só avança cursor e retorna
+            if (counters.size === 0) {
+                await env.CURSORS.put(cursorKey, newCursor, { expirationTtl: 60 * 60 * 24 * 7 });
+                console.log("No valid items; cursor advanced to", newCursor);
+                return;
+            }
 
+            neonConfig.fetch = fetch; // obrigatório em Workers
+            const sql = neon(env.NEON_DATABASE_URL);
+
+            await sql`BEGIN`;
+            try {
+                for (const [articleId, viewsInc] of counters.entries()) {
+                    const v = BigInt(viewsInc || 0);
+                    await sql`
+                        INSERT INTO article_metrics (article_id, views, likes, updated_at)
+                        VALUES (${articleId}, ${v}, 0, now())
+                        ON CONFLICT (article_id) DO UPDATE
+                        SET
+                        views      = article_metrics.views + EXCLUDED.views,
+                        updated_at = now()
+                    `;
+                }
+
+                // (Opcional) rollup diário
+                for (const [articleId, viewsInc] of counters.entries()) {
+                    const v = BigInt(viewsInc || 0);
+                    await sql`
+                        INSERT INTO article_metrics_daily (article_id, day, views, likes)
+                        VALUES (${articleId}, CURRENT_DATE, ${v}, 0)
+                        ON CONFLICT (article_id, day) DO UPDATE
+                        SET
+                        views = article_metrics_daily.views + EXCLUDED.views
+                    `;
+                }
+
+                await sql`COMMIT`;
+            } catch (e) {
+                await sql`ROLLBACK`;
+                throw e;
+            }
             // 4) salva cursor
             await env.CURSORS.put(cursorKey, newCursor, { expirationTtl: 60 * 60 * 24 * 7 }); // 7 dias ttl
             console.log("Updated cursor to", newCursor);

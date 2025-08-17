@@ -45,14 +45,20 @@ module "queues" {
 module "workers" {
   source = "./modules/workers"
 
-  account_id         = local.account_id
-  zone_id            = local.zone_id
-  loki_endpoint      = var.loki_endpoint
-  loki_password      = var.loki_password
-  loki_user          = var.loki_user
-  upstash_rest_token = module.queues.upstash_rest_token
-  upstash_rest_url   = module.queues.upstash_rest_url
-  r2_bucket_name     = var.bucket_name
+  account_id             = local.account_id
+  zone_id                = local.zone_id
+  loki_endpoint          = var.loki_endpoint
+  loki_password          = var.loki_password
+  loki_user              = var.loki_user
+  upstash_rest_token     = module.queues.upstash_rest_token
+  upstash_rest_url       = module.queues.upstash_rest_url
+  r2_bucket_name         = var.bucket_name
+  neon_database_url      = module.database.neon_database_url
+  revalidate_token       = var.revalidate_token
+  next_revalidate_secret = var.next_revalidate_secret
+  api_purge_token        = var.api_purge_token
+  next_host              = var.next_host
+  domain                 = var.domain
 
   depends_on = [
     module.r2
